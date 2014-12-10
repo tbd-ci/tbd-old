@@ -15,18 +15,12 @@ func Build() error {
 		return err
 	}
 
-	//dockerfile, err := os.Open("./Dockerfile")
-	//if err != nil {
-	//  return fmt.Errorf("os.Open: %s", err)
-	//}
-	//defer dockerfile.Close()
-
 	var builder docker.BuildImageOptions
 
 	builder.Name = "testapp"
 	builder.RmTmpContainer = true
+	builder.ContextDir = "."
 	builder.OutputStream = os.Stderr
-	builder.Remote = "foo/bar/baz"
 
 	err = client.BuildImage(builder)
 	if err != nil {
