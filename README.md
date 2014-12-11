@@ -1,4 +1,4 @@
-# scatterbox
+# tbd
 
 A decentralised ci server using docker. Any linux machine can be a CI agent with Docker.
 
