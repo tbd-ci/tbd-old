@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/JimGaylard/scatterbox/builder"
+	"github.com/JimGaylard/tbd/builder"
 )
 
 func main() {
