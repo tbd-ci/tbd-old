@@ -72,22 +72,14 @@ func main() {
 	cmd.Stdout = &multiBufferWriter{os.Stdout, &stdout, &combined}
 	cmd.Stderr = &multiBufferWriter{os.Stderr, &stderr, &combined}
 
-	// stdout, stderr, combined := capture(cmd)
 	run(cmd)
 
-	debug("Combined output")
-	debug(combined.String())
-	debug("StdOut ")
-	debug(stdout.String())
-	debug("StdErr")
-	debug(stderr.String())
-	debug("Exit Status")
-	foo := cmd.ProcessState.Sys().(syscall.WaitStatus)
-	debug(foo.ExitStatus())
+	// Will panic on systems without exit statuses
+	waitStatus := cmd.ProcessState.Sys().(syscall.WaitStatus)
 
 	if *config.propagateErrors {
 		defer func() {
-			os.Exit(foo.ExitStatus())
+			os.Exit(waitStatus.ExitStatus())
 		}()
 	}
 
@@ -137,7 +129,6 @@ func worktree() string {
 	env = append(env, "GIT_INDEX_FILE="+dir+"/index")
 
 	output, err := withEnv(env, "git", "add", "-A", ".").CombinedOutput()
-	debug(output)
 
 	die(err)
 
