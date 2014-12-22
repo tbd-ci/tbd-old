@@ -1,5 +1,10 @@
 package main
 
+// TODO: Windows
+// TODO: Save worktree
+// TODO: Save exit status
+// TBD: when/how should I record 'I am about to start building this'
+
 import (
 	"bytes"
 	"flag"
@@ -22,7 +27,7 @@ func init() {
 
 	config.prefix = flag.String(
 		"prefix",
-		"",
+		"refs/builds/",
 		"(required): Store run output under this git ref prefix",
 	)
 	config.propagateErrors = flag.Bool(
@@ -49,8 +54,16 @@ type Config struct {
 	debug           *bool
 }
 
+func (c Config) Prefix() string {
+	if c.prefix == nil {
+		return ""
+	} else {
+		return *c.prefix
+	}
+}
+
 func (c Config) Valid() bool {
-	return !((c.prefix == nil) || (*c.prefix == "") || (len(flag.Args()) == 0))
+	return !(c.Prefix() == "" || (len(flag.Args()) == 0))
 }
 
 var config Config
@@ -83,7 +96,7 @@ func main() {
 		}()
 	}
 
-	prefix := "refs/" + *config.prefix + "/" + treeBeforeBuild
+	prefix := *config.prefix + treeBeforeBuild
 
 	updateRef(prefix+"/STDOUT", hashFor(&stdout))
 	updateRef(prefix+"/STDERR", hashFor(&stderr))
