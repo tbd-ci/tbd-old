@@ -1,9 +1,10 @@
 package main
 
+// TODO: Sign commits with your public key
 // TODO: Windows
 // TODO: Save worktree
 // TODO: Save exit status
-// TBD: when/how should I record 'I am about to start building this'
+// TBD: when/how should I record 'I am about to start building this' on a remote to let build agents collaborate
 
 import (
 	"bytes"
