@@ -1,17 +1,18 @@
 package main
 
-// TODO: Sign commits with your public key
-// TODO: Windows
-// TODO: Save worktree
+// TODO: should this use git2go instead of CLI?
+// TODO: if not using git2go, extract types for each git subcommand
 // TODO: Save exit status
-// TBD: when/how should I record 'I am about to start building this' on a remote to let build agents collaborate
+// TODO: Save worktree
+// TODO: Save timestamped versions of the build output
+// TODO: Accept a worktree/ref
 
 import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/JimGaylard/tbd/tbd_save_tree/save_tree"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -22,7 +23,7 @@ func init() {
 	flag.Usage = func() {
 		fmt.Printf("Usage of %s:\n", os.Args[0])
 		flag.PrintDefaults()
-		fmt.Println("The final argument(s) are exec'd and the results stored.")
+		fmt.Println("The final argument(s) are exec'd and the results stored in git.")
 		fmt.Println("The working directory is expected to be the top level of a git repo")
 	}
 
@@ -77,7 +78,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	treeBeforeBuild := worktree()
+	treeBeforeBuild, err := save_tree.Worktree()
+	die(err)
 	cmd := exec.Command(flag.Args()[0], flag.Args()[1:]...)
 	stdout := bytes.Buffer{}
 	stderr := bytes.Buffer{}
@@ -88,11 +90,14 @@ func main() {
 
 	run(cmd)
 
-	// Will panic on systems without exit statuses
+	// TODO: panics on systems without exit statuses (windows)
 	waitStatus := cmd.ProcessState.Sys().(syscall.WaitStatus)
 
 	if *config.propagateErrors {
 		defer func() {
+			// TODO: This will exit with success if the build passed
+			// but updating the ref paniced
+			// die() is probably a bad idea.
 			os.Exit(waitStatus.ExitStatus())
 		}()
 	}
@@ -136,29 +141,6 @@ func updateRef(ref, sha string) {
 	die(err)
 }
 
-func worktree() string {
-	env := os.Environ()
-	dir, err := ioutil.TempDir("", "tbd_index")
-	die(err)
-	env = append(env, "GIT_INDEX_FILE="+dir+"/index")
-
-	output, err := withEnv(env, "git", "add", "-A", ".").CombinedOutput()
-
-	die(err)
-
-	worktree, err := withEnv(env, "git", "write-tree").Output()
-	debug(worktree)
-	die(err)
-
-	return strip(string(worktree))
-}
-
-func withEnv(env []string, target ...string) *exec.Cmd {
-	c := exec.Command(target[0], target[1:]...)
-	c.Env = env
-	return c
-}
-
 type multiBufferWriter struct {
 	primary  *os.File
 	output   *bytes.Buffer
@@ -182,3 +164,6 @@ func die(err error) {
 	panic(err)
 	os.Exit(1)
 }
+
+// LATER: Sign build artefacts with your public key
+// LATER: Windows
