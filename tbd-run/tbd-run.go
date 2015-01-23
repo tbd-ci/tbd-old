@@ -5,7 +5,10 @@ package main
 // TODO: Save exit status
 // TODO: Save worktree
 // TODO: Save timestamped versions of the build output
-// TODO: Accept a worktree/ref
+// TODO: Make prefix default to blank. Caller should put the worktree into the prefix.
+// TO DONT: Accept a worktree/ref (not the responsibility of this task)
+// LATER: Sign build artefacts with your public key
+// LATER: Windows
 
 import (
 	"bytes"
@@ -164,6 +167,3 @@ func die(err error) {
 	panic(err)
 	os.Exit(1)
 }
-
-// LATER: Sign build artefacts with your public key
-// LATER: Windows
