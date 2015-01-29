@@ -26,7 +26,7 @@ func Worktree() (string, error) {
 		return "", err
 	}
 
-	index.AddAll([]string{"."}, git.GIT_INDEX_ADD_DEFAULT, afterIndexCreated)
+	index.AddAll([]string{"."}, git.IndexAddDefault, afterIndexCreated)
 
 	treeOid, err := index.WriteTreeTo(repo)
 	if err != nil {
