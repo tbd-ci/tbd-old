@@ -13,7 +13,25 @@ func Worktree() (string, error) {
 		return "", err
 	}
 
+	tree, err := repo.RevparseSingle("HEAD^{tree}")
+	if err != nil {
+		return "", err
+	}
+
+	treeId := tree.Id()
+
+	entry := git.IndexEntry{
+		Mode: git.FilemodeTree,
+		Id:   treeId,
+		Path: ".",
+	}
+
 	index, err := git.NewIndex()
+	if err != nil {
+		return "", err
+	}
+
+	err = index.Add(&entry)
 	if err != nil {
 		return "", err
 	}
