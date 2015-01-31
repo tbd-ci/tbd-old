@@ -5,8 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
-
-	"github.com/libgit2/git2go"
+	"strings"
 )
 
 func main() {
@@ -21,7 +20,7 @@ func main() {
 		fmt.Println(err)
 		log.Fatalf("checkout: %s", err)
 	}
-	fmt.Println(tmpDir)
+	fmt.Print(tmpDir)
 }
 
 func mktmp_d() (string, error) {
@@ -30,7 +29,7 @@ func mktmp_d() (string, error) {
 		return "", err
 	}
 
-	return string(out), nil
+	return strings.TrimSpace(string(out)), nil
 }
 
 func checkout_tmp(tree string) (string, error) {
@@ -48,6 +47,7 @@ func checkout_tmp(tree string) (string, error) {
 	}
 
 	cmd2.Stdout = os.Stdout
+	cmd2.Stderr = os.Stderr
 
 	err = cmd2.Start()
 	if err != nil {
