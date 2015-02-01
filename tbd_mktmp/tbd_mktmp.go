@@ -3,10 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
+	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 func init() {
@@ -29,22 +28,12 @@ func main() {
 	tmpDir, err := checkoutTmp(tree)
 	if err != nil {
 		fmt.Println(err)
-		log.Fatalf("clone: %s", err)
 	}
 	fmt.Println(tmpDir)
 }
 
-func mkTmpD() (string, error) {
-	out, err := exec.Command("mktemp", "-d").Output()
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(string(out)), nil
-}
-
 func checkoutTmp(tree string) (string, error) {
-	tmpPath, err := mkTmpD()
+	tmpPath, err := ioutil.TempDir("", "tbd_build")
 	if err != nil {
 		return "", err
 	}
