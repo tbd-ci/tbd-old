@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -8,22 +9,32 @@ import (
 	"strings"
 )
 
-func main() {
-	path, err := mktmp_d()
-	if err != nil {
-		fmt.Println(err)
-		log.Fatal("mktmp_d: %s", err)
+func init() {
+	flag.Usage = func() {
+		fmt.Printf("Usage of %s:\n", os.Args[0])
+		fmt.Println("Takes a git tree object and checks it out to a new tmp dir.")
+		fmt.Printf("%s [options...] <tree>", os.Args[0])
+		flag.PrintDefaults()
 	}
-
-	tmpDir, err := checkout_tmp(path)
-	if err != nil {
-		fmt.Println(err)
-		log.Fatalf("checkout: %s", err)
-	}
-	fmt.Print(tmpDir)
 }
 
-func mktmp_d() (string, error) {
+func main() {
+	if len(os.Args) != 2 {
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	tree := os.Args[1]
+
+	tmpDir, err := checkoutTmp(tree)
+	if err != nil {
+		fmt.Println(err)
+		log.Fatalf("clone: %s", err)
+	}
+	fmt.Println(tmpDir)
+}
+
+func mkTmpD() (string, error) {
 	out, err := exec.Command("mktemp", "-d").Output()
 	if err != nil {
 		return "", err
@@ -32,14 +43,14 @@ func mktmp_d() (string, error) {
 	return strings.TrimSpace(string(out)), nil
 }
 
-func checkout_tmp(tree string) (string, error) {
-	tmp_path, err := mktmp_d()
+func checkoutTmp(tree string) (string, error) {
+	tmpPath, err := mkTmpD()
 	if err != nil {
 		return "", err
 	}
 
 	cmd1 := exec.Command("git", "archive", tree)
-	cmd2 := exec.Command("tar", "-x", "-C", tmp_path)
+	cmd2 := exec.Command("tar", "-x", "-C", tmpPath)
 
 	cmd2.Stdin, err = cmd1.StdoutPipe()
 	if err != nil {
@@ -64,5 +75,5 @@ func checkout_tmp(tree string) (string, error) {
 		return "", err
 	}
 
-	return tmp_path, err
+	return tmpPath, nil
 }
