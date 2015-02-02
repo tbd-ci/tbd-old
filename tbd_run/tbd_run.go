@@ -14,7 +14,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/JimGaylard/tbd/tbd_save_tree/save_tree"
 	"io"
 	"os"
 	"os/exec"
@@ -81,8 +80,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	treeBeforeBuild, err := save_tree.Worktree()
-	die(err)
 	cmd := exec.Command(flag.Args()[0], flag.Args()[1:]...)
 	stdout := bytes.Buffer{}
 	stderr := bytes.Buffer{}
@@ -105,11 +102,9 @@ func main() {
 		}()
 	}
 
-	prefix := *config.prefix + treeBeforeBuild
-
-	updateRef(prefix+"/STDOUT", hashFor(&stdout))
-	updateRef(prefix+"/STDERR", hashFor(&stderr))
-	updateRef(prefix+"/OUTPUT", hashFor(&combined))
+	updateRef(*config.prefix+"/STDOUT", hashFor(&stdout))
+	updateRef(*config.prefix+"/STDERR", hashFor(&stderr))
+	updateRef(*config.prefix+"/OUTPUT", hashFor(&combined))
 }
 
 func run(cmd *exec.Cmd) {
