@@ -2,8 +2,8 @@ package mktmp
 
 import (
 	"io/ioutil"
-	"os"
-	"os/exec"
+
+	"github.com/libgit2/git2go"
 )
 
 func CheckoutTmp(tree string) (string, error) {
@@ -12,28 +12,24 @@ func CheckoutTmp(tree string) (string, error) {
 		return "", err
 	}
 
-	cmd1 := exec.Command("git", "archive", tree)
-	cmd2 := exec.Command("tar", "-x", "-C", tmpPath)
-
-	cmd2.Stdin, err = cmd1.StdoutPipe()
+	repo, err := git.OpenRepository(".")
 	if err != nil {
 		return "", err
 	}
 
-	cmd2.Stdout = os.Stdout
-	cmd2.Stderr = os.Stderr
-
-	err = cmd2.Start()
+	treeOid, err := git.NewOid(tree)
 	if err != nil {
 		return "", err
 	}
 
-	err = cmd1.Run()
-	if err != nil {
-		return "", err
-	}
+	treeId, err := repo.LookupTree(treeOid)
 
-	err = cmd2.Wait()
+	var checkoutOpts git.CheckoutOpts
+
+	checkoutOpts.Strategy = git.CheckoutForce
+	checkoutOpts.TargetDirectory = tmpPath
+
+	err = repo.CheckoutTree(treeId, &checkoutOpts)
 	if err != nil {
 		return "", err
 	}
