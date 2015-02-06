@@ -17,7 +17,7 @@ func init() {
 		flag.PrintDefaults()
 	}
 
-	config.ciDir = flag.String("ci_dir", "ci", "ci directory")
+	config.ciDir = flag.String("ci-dir", "ci", "ci directory")
 }
 
 type Config struct {
