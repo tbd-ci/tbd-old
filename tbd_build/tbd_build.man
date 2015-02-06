@@ -3,7 +3,8 @@
 tbd_build \- Run the tbd build process.
 .SH SYNOPSIS
 .TP
-.B tbd build <command>
+.B tbd build [options] <tree-id>
+
 .SH DESCRIPTION
 tbd_build runs the main build process. For each subdirectory within the ci/
 folder of the current working directory, tbd will check out a copy of your
@@ -12,7 +13,11 @@ the ouput of those commands to git (see tbd-run(1)).
 .PP
 .SH OPTIONS
 .TP
-\-h display a short help text
+\-h
+display a short help text
+.TP
+\-ci-dir
+ci directory for your project
 .PP
 .SH "TBD"
 .sp
