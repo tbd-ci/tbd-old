@@ -23,6 +23,9 @@ func CheckoutTmp(tree string) (string, error) {
 	}
 
 	treeId, err := repo.LookupTree(treeOid)
+	if err != nil {
+		return "", err
+	}
 
 	var checkoutOpts git.CheckoutOpts
 
