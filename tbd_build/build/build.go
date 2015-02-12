@@ -15,14 +15,14 @@ func rmTmp(tmpDir string) error {
 	return nil
 }
 
-func Build(tree, ciPath string) error {
-	// TODO: delete tmpDir after run
+func Build(tree, buildDir, ciPath string) error {
 	walkFunc := func(path string, info os.FileInfo, e error) error {
 		if e != nil {
 			return e
 		}
 
-		if !info.IsDir() || path == "ci" {
+		// Only run for each of "ci/stage" subdirectories
+		if !info.IsDir() || filepath.Base(path) == "ci" {
 			return nil
 		}
 
@@ -32,10 +32,16 @@ func Build(tree, ciPath string) error {
 		}
 		defer rmTmp(tmpDir)
 
-		ciCmd := filepath.Join(tmpDir, path, "run")
+		// Get the relative path of each command to run as we will be running
+		// it in its own tmp directory (not in `path`)
+		ciCmd := filepath.Join(path, "run")
+		relCmd, err := filepath.Rel(buildDir, ciCmd)
+		if err != nil {
+			return err
+		}
 
 		refPrefix := filepath.Join("refs", "builds", tree, filepath.Base(path))
-		cmd := exec.Command("tbd_run", "-propagateErrors", "-prefix", refPrefix, ciCmd)
+		cmd := exec.Command("tbd_run", "-propagateErrors", "-prefix", refPrefix, filepath.Join(tmpDir, relCmd))
 
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -48,7 +54,7 @@ func Build(tree, ciPath string) error {
 		return nil
 	}
 
-	err := filepath.Walk(ciPath, walkFunc)
+	err := filepath.Walk(filepath.Join(buildDir, ciPath), walkFunc)
 	if err != nil {
 		return err
 	}

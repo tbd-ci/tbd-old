@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/JimGaylard/tbd/tbd_build/build"
+	"github.com/JimGaylard/tbd/tbd_mktmp/mktmp"
 )
 
 func init() {
@@ -34,11 +35,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	err := build.Build(os.Args[1], *config.ciDir)
+	buildDir, err := mktmp.CheckoutTmp(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rmBuildDir(buildDir)
+
+	err = build.Build(os.Args[1], buildDir, *config.ciDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func rmBuildDir(buildDir string) {
 	if err := os.RemoveAll(buildDir); err != nil {
 		log.Fatal(err)
