@@ -8,6 +8,13 @@ import (
 	"github.com/JimGaylard/tbd/tbd_mktmp/mktmp"
 )
 
+func rmTmp(tmpDir string) error {
+	if err := os.RemoveAll(tmpDir); err != nil {
+		return err
+	}
+	return nil
+}
+
 func Build(tree, ciPath string) error {
 	// TODO: delete tmpDir after run
 	walkFunc := func(path string, info os.FileInfo, e error) error {
@@ -23,6 +30,7 @@ func Build(tree, ciPath string) error {
 		if err != nil {
 			return err
 		}
+		defer rmTmp(tmpDir)
 
 		ciCmd := filepath.Join(tmpDir, path, "run")
 

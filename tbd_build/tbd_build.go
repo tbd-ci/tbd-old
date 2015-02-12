@@ -37,6 +37,10 @@ func main() {
 	err := build.Build(os.Args[1], *config.ciDir)
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
+	}
+	defer rmBuildDir(buildDir)
+func rmBuildDir(buildDir string) {
+	if err := os.RemoveAll(buildDir); err != nil {
+		log.Fatal(err)
 	}
 }
