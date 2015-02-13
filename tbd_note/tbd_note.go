@@ -19,18 +19,19 @@ func init() {
 	}
 
 	// TODO: this default value won't work. Provide a sensible default
-	config.tree = flag.String("tree", "HEAD^{tree}", "tree that note is attached to")
+	tree := flag.String("tree", "HEAD^{tree}", "tree that note is attached to")
+	config.tree = *tree
 }
 
 type Config struct {
-	tree *string
+	tree string
 }
 
 var config Config
 
 func (c Config) valid() bool {
 	// TODO: Use git to check for valid tree
-	matched, err := regexp.MatchString(`[a-fA-F0-9]{40}`, *config.tree)
+	matched, err := regexp.MatchString(`[a-fA-F0-9]{40}`, config.tree)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,7 +47,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	noteId, err := note.WriteNote(config.tree, &flag.Args()[0])
+	noteId, err := note.WriteNote(config.tree, flag.Args()[0])
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

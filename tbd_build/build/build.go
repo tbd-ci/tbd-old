@@ -1,12 +1,16 @@
 package build
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 
 	"github.com/JimGaylard/tbd/tbd_mktmp/mktmp"
+	"github.com/JimGaylard/tbd/tbd_note/note"
 )
+
+var cmdVal int
 
 func rmTmp(tmpDir string) error {
 	if err := os.RemoveAll(tmpDir); err != nil {
@@ -57,6 +61,21 @@ func Build(tree, buildDir, ciPath string) error {
 	err := filepath.Walk(filepath.Join(buildDir, ciPath), walkFunc)
 	if err != nil {
 		return err
+	}
+
+	success := fmt.Sprintln("Build was successful")
+	failure := fmt.Sprintln("Build failed")
+
+	if cmdVal == 0 {
+		note.WriteNote(
+			tree,
+			success,
+		)
+	} else {
+		note.WriteNote(
+			tree,
+			failure,
+		)
 	}
 
 	return nil

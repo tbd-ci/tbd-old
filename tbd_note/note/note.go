@@ -37,13 +37,13 @@ func userDetails() (User, error) {
 	return user, err
 }
 
-func WriteNote(tree, buildResult *string) (string, error) {
+func WriteNote(tree, buildResult string) (string, error) {
 	repo, err := git.OpenRepository(".")
 	if err != nil {
 		return "", err
 	}
 
-	treeOid, err := git.NewOid(*tree)
+	treeOid, err := git.NewOid(tree)
 	if err != nil {
 		return "", err
 	}
@@ -66,7 +66,7 @@ func WriteNote(tree, buildResult *string) (string, error) {
 		&authorSig,
 		&authorSig,
 		treeOid,
-		fmt.Sprintf("%s at %v", *buildResult, time.Now()),
+		fmt.Sprintf("%s at %v", buildResult, time.Now()),
 		true,
 	)
 	if err != nil {
