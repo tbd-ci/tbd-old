@@ -3,7 +3,7 @@
 tbd_note \- Add build notes to a git tree object
 .SH SYNOPSIS
 .TP
-\fBtbd_note\fR <\fItree-id\fR>
+\fBtbd_note\fR [-tree=<\fItree-id\fR>] <\fImessage\fR>
 
 .SH DESCRIPTION
 .B tbd_note
