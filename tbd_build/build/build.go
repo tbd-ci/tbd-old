@@ -45,7 +45,7 @@ func Build(tree, buildDir, ciPath string) error {
 		}
 
 		refPrefix := filepath.Join("refs", "builds", tree, filepath.Base(path))
-		cmd := exec.Command("tbd_run", "-propagateErrors", "-prefix", refPrefix, filepath.Join(tmpDir, relCmd))
+		cmd := exec.Command("tbd_run", "-prefix", refPrefix, filepath.Join(tmpDir, relCmd))
 
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
