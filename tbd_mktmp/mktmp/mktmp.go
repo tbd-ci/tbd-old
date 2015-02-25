@@ -14,6 +14,7 @@ func CheckoutTmp(tree string) (string, error) {
 
 	repo, err := git.OpenRepository(".")
 	if err != nil {
+		fmt.Println(err.Class)
 		return "", err
 	}
 
