@@ -1,22 +1,38 @@
 package output
 
 import (
+	"io/ioutil"
 	"log"
+	"path/filepath"
 
 	git "github.com/libgit2/git2go"
 )
 
-func Display(treeish string) error {
+func Display(config *Config, treeish string) error {
+	// TODO: handle -only flag
+	// TODO: handle "latest" for -build flag
 	repo, err := git.OpenRepository(".")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	treeOid, err := treeId(repo, treeish)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	log.Println(treeOid.String())
+	treeId := treeOid.String()
 
 	return nil
+}
+
+func readBuild(ref, treeOid string) ([]byte, error) {
+	buf, err := ioutil.ReadFile(filepath.Join("refs", "builds", treeOid, stage, stream))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return buf, nil
 }
 
 func treeId(repo *git.Repository, treeish string) (*git.Oid, error) {

@@ -23,6 +23,7 @@ func init() {
 	}
 
 	config.stream = flag.String("only", "combined", "only display stdout|stderr or combined")
+	config.build = flag.String("prompt-for-build", "latest", "display output of which build number/run")
 }
 
 func main() {
@@ -32,7 +33,7 @@ func main() {
 		fmt.Println(flag.Args())
 	}
 
-	if err := output.Display(flag.Args()[0]); err != nil {
+	if err := output.Display(flag.Args()[0], &config); err != nil {
 		panic(err)
 	}
 }
