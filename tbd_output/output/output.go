@@ -12,17 +12,39 @@ func Display(treeish string) error {
 		log.Fatal(err)
 	}
 
-	treeOid, err := git.NewOid(treeish)
+	//treeOid, err := git.NewOid(treeish)
+	//if err != nil {
+	//  log.Fatal(err)
+	//}
+
+	object, err := repo.RevparseSingle(treeish)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	object, err := repo.Lookup(treeOid)
-	if err != nil {
-		log.Fatal(err)
+	var treeOid *git.Oid
+
+	switch object.Type() {
+	case git.ObjectCommit:
+		commit, err := repo.LookupCommit(object.Id())
+		if err != nil {
+			return err
+		}
+
+		tree, err := commit.Tree()
+		if err != nil {
+			return err
+		}
+
+		treeOid = tree.Id()
+
+	case git.ObjectTree:
+		treeOid = object.Id()
+	default:
+		log.Fatalf("%s is not a tag, commit or a tree object", treeish)
 	}
 
-	log.Println(object.Type())
+	log.Println(treeOid.String())
 
 	return nil
 }
