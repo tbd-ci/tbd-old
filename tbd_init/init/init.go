@@ -3,7 +3,9 @@ package init
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
+	"strings"
 )
 
 func Init() error {
@@ -14,6 +16,12 @@ func Init() error {
 		text, err := reader.ReadString('\n')
 		if err != nil {
 			return err
+		}
+
+		if strings.Trim(text, "\n\r") == "y" || strings.Trim(text, "\n\r") == "Y" {
+			if err := os.Mkdir("ci", os.ModeDir); err != nil {
+				log.Fatal(err)
+			}
 		}
 
 		fmt.Println(text)
