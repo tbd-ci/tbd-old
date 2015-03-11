@@ -10,6 +10,23 @@ import (
 
 type Config struct {
 	stream *string
+	build  *string
+}
+
+func (c *Config) Stream(some *SomeInterface) string {
+	return *c.stream
+}
+
+func (c *Config) Build() string {
+	return *c.build
+}
+
+func (some *SomeInterface) StreamMethod() {
+	//only
+}
+
+func (some *SomeInterface) StreamMethod() {
+	//combined
 }
 
 var config Config
@@ -33,7 +50,7 @@ func main() {
 		fmt.Println(flag.Args())
 	}
 
-	if err := output.Display(flag.Args()[0], &config); err != nil {
+	if err := output.Display(&config, flag.Args()[0]); err != nil {
 		panic(err)
 	}
 }

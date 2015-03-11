@@ -8,9 +8,17 @@ import (
 	git "github.com/libgit2/git2go"
 )
 
-func Display(config *Config, treeish string) error {
+type Config interface {
+	Stream() string
+	Build() string
+}
+
+func Display(config Config, treeish string) error {
 	// TODO: handle -only flag
 	// TODO: handle "latest" for -build flag
+	stream := config.Stream()
+
+	log.Println(stream)
 	repo, err := git.OpenRepository(".")
 	if err != nil {
 		log.Fatal(err)
@@ -22,12 +30,13 @@ func Display(config *Config, treeish string) error {
 	}
 
 	treeId := treeOid.String()
+	log.Println(treeId)
 
 	return nil
 }
 
 func readBuild(ref, treeOid string) ([]byte, error) {
-	buf, err := ioutil.ReadFile(filepath.Join("refs", "builds", treeOid, stage, stream))
+	buf, err := ioutil.ReadFile(filepath.Join("refs", "builds", treeOid)) // stage, stream
 	if err != nil {
 		log.Fatal(err)
 	}
