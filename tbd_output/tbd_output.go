@@ -8,28 +8,7 @@ import (
 	"github.com/JimGaylard/tbd/tbd_output/output"
 )
 
-type Config struct {
-	stream *string
-	build  *string
-}
-
-func (c *Config) Stream(some *SomeInterface) string {
-	return *c.stream
-}
-
-func (c *Config) Build() string {
-	return *c.build
-}
-
-func (some *SomeInterface) StreamMethod() {
-	//only
-}
-
-func (some *SomeInterface) StreamMethod() {
-	//combined
-}
-
-var config Config
+var config output.Config
 
 func init() {
 	flag.Usage = func() {
@@ -39,18 +18,19 @@ func init() {
 		flag.PrintDefaults()
 	}
 
-	config.stream = flag.String("only", "combined", "only display stdout|stderr or combined")
-	config.build = flag.String("prompt-for-build", "latest", "display output of which build number/run")
+	config.Stream = *flag.String("only", "", "only display stdout|stderr or combined")
+	config.Build = *flag.String("build", "latest", "display output of which build number/run")
 }
 
 func main() {
 	flag.Parse()
 
 	if len(flag.Args()) != 1 {
-		fmt.Println(flag.Args())
+		flag.Usage()
+		os.Exit(1)
 	}
 
-	if err := output.Display(&config, flag.Args()[0]); err != nil {
+	if err := output.Display(flag.Args()[0], config); err != nil {
 		panic(err)
 	}
 }
