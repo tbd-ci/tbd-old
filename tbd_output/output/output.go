@@ -1,7 +1,7 @@
 package output
 
 import (
-	"io/ioutil"
+	"fmt"
 	"log"
 	"path/filepath"
 
@@ -30,21 +30,36 @@ func Display(treeish string, config Config) error {
 
 	treeId := treeOid.String()
 
-	return nil
-}
-
-func readBuild(ref, treeOid string) ([]byte, error) {
-	buf, err := ioutil.ReadFile(filepath.Join("refs",
+	outputPath := filepath.Join(
+		"refs",
 		"builds",
-		treeOid,
-		build,
-		stream,
-	))
+		treeId,
+		config.Build,
+		config.Stream,
+	)
+
+	buf, err := readBuild(outputPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return buf, nil
+	blob, err := buf.Read()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(blob)
+
+	return nil
+}
+
+func readBuild(path string) (buf []byte, err error) {
+	buf, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return
 }
 
 func treeId(repo *git.Repository, treeish string) (*git.Oid, error) {
