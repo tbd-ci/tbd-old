@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/JimGaylard/tbd/builder"
+	"github.com/tbd-ci/tbd/builder"
 )
 
 func main() {

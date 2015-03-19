@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/JimGaylard/libgit2/git2go"
+	"github.com/tbd-ci/libgit2/git2go"
 )
 
 func TestTmpDir(t *testing.T) {
