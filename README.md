@@ -32,20 +32,23 @@ Core ideas driving `tbd` which are different to traditional CI:
 ## Build storage
 
 `tbd` stores build results in a git branch (called `tbd-ci` by default, controlled by TBD_STORAGE_BRANCH).
+When a build is triggered by a commit, the results are written to `tbd-ci` as a merge commit. If that tree has already been built, you'll still get a merge commit but it will have no changes.
+If a build is triggered by a worktree you just get a regular commit; there's no second parent for the merge.
 
 `tbd-ci` commits contain a directory for each commit/worktree which has ever been built.
 Because of how git stores files, this requires very little storage.
+Artifact storage is opt-in; your build configuration can include an array of artifacts which will be passed to `git add -f` and written to the build output.
 
 Example directory structure:
 
 ```
 <source worktree sha>
-  <build host and timestamp>
-    <spec:coverage>
+  <spec:coverage>
+    <build timestamp and host>
       STDOUT
       STDERR
       ETC
-      <tree after build>
+      artifacts/
         application files
         build artifacts
 <source commit sha>
@@ -56,7 +59,7 @@ When you run a build, you create a new commit and update the `tbd-ci` branch
 
 To check a file that was modified by the build process:
 `git show tbd-ci:<commit>/<metadata-hash>/<target>/WORKTREE/<artifact>`
-`tbd show <ref-like> [--build-number <metadata-hash, defaults to latest>] <target>/WORKTREE/<artifact>`
+`tbd show <ref-like> <target> [--build-number <metadata-hash, defaults to most recent>] WORKTREE/<artifact>`
 
 ### Advantages
  * Builds can be viewed & data extracted without tbd tools installed
@@ -71,3 +74,7 @@ No garbage collection for builds of a tree that was never pushed
 
 It's easy commit a large binary as part of the post-build worktree and hard to undo.
  * We'll need to make it obvious, when writing a build to git, that artifacts have been saved (name/size)
+
+A developer could carelessly check out `tbd-ci`, which would cause a *lot* of files to be written to their machine.
+ * If you're concerned about this, configure tbd to write to a ref instead
+ * TODO: Should we always write to a ref and require developers to configure their repo appropriately?
