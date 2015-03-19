@@ -32,6 +32,8 @@ Core ideas driving `tbd` which are different to traditional CI:
 ## Build storage
 
 `tbd` stores build results in a git branch (called `tbd-ci` by default, controlled by TBD_STORAGE_BRANCH).
+When a build is triggered by a commit, the results are written to `tbd-ci` as a merge commit. If that tree has already been built, you'll still get a merge commit but it will have no changes.
+If a build is triggered by a worktree you just get a regular commit; there's no second parent for the merge.
 
 `tbd-ci` commits contain a directory for each commit/worktree which has ever been built.
 Because of how git stores files, this requires very little storage.
