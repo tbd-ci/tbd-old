@@ -40,8 +40,8 @@ Example directory structure:
 
 ```
 <source worktree sha>
-  <build host and timestamp>
-    <spec:coverage>
+  <spec:coverage>
+    <build timestamp and host>
       STDOUT
       STDERR
       ETC
@@ -56,7 +56,7 @@ When you run a build, you create a new commit and update the `tbd-ci` branch
 
 To check a file that was modified by the build process:
 `git show tbd-ci:<commit>/<metadata-hash>/<target>/WORKTREE/<artifact>`
-`tbd show <ref-like> [--build-number <metadata-hash, defaults to latest>] <target>/WORKTREE/<artifact>`
+`tbd show <ref-like> <target> [--build-number <metadata-hash, defaults to most recent>] WORKTREE/<artifact>`
 
 ### Advantages
  * Builds can be viewed & data extracted without tbd tools installed
