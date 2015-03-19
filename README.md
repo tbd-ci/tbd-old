@@ -35,6 +35,7 @@ Core ideas driving `tbd` which are different to traditional CI:
 
 tbd commits contain a directory for each commit/worktree which has ever been built.
 Because of how git stores files, this requires very little storage.
+Artifact storage is opt-in; your build configuration can include an array of artifacts which will be passed to `git add -f` and written to the build output.
 
 Example directory structure:
 
@@ -45,7 +46,7 @@ Example directory structure:
       STDOUT
       STDERR
       ETC
-      <tree after build>
+      artifacts/
         application files
         build artifacts
 <source commit sha>
