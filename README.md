@@ -73,3 +73,6 @@ No garbage collection for builds of a tree that was never pushed
 
 It's easy commit a large binary as part of the post-build worktree and hard to undo.
  * We'll need to make it obvious, when writing a build to git, that artifacts have been saved (name/size)
+A developer could carelessly check out `tbd-ci`, which would cause a *lot* of files to be written to their machine.
+ * If you're concerned about this, configure tbd to write to a ref instead
+ * TODO: Should we always write to a ref and require developers to configure their repo appropriately?
