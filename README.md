@@ -37,6 +37,7 @@ If a build is triggered by a worktree you just get a regular commit; there's no 
 
 `tbd-ci` commits contain a directory for each commit/worktree which has ever been built.
 Because of how git stores files, this requires very little storage.
+Artifact storage is opt-in; your build configuration can include an array of artifacts which will be passed to `git add -f` and written to the build output.
 
 Example directory structure:
 
@@ -47,7 +48,7 @@ Example directory structure:
       STDOUT
       STDERR
       ETC
-      <tree after build>
+      artifacts/
         application files
         build artifacts
 <source commit sha>
@@ -73,6 +74,7 @@ No garbage collection for builds of a tree that was never pushed
 
 It's easy commit a large binary as part of the post-build worktree and hard to undo.
  * We'll need to make it obvious, when writing a build to git, that artifacts have been saved (name/size)
+
 A developer could carelessly check out `tbd-ci`, which would cause a *lot* of files to be written to their machine.
  * If you're concerned about this, configure tbd to write to a ref instead
  * TODO: Should we always write to a ref and require developers to configure their repo appropriately?
