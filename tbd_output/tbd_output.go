@@ -30,7 +30,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := output.Display(flag.Args()[0], config); err != nil {
-		panic(err)
-	}
+	config.Treeish = flag.Args()[0]
+
+	//if err := output.Display(config); err != nil {
+	//  panic(err)
+	//}
 }
