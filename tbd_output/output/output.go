@@ -9,39 +9,24 @@ import (
 )
 
 type Output struct {
-	Repository *git.Repository
-	Treeish    string
-	Build      string
-	Stage      string
-	Stream     string
-}
-
-func (c Output) repo() error {
-	if c.Repo == nil {
-		repo, err := git.OpenRepository(".")
-		if err != nil {
-			return err
-		}
-		c.Repo = repo
-	}
-	return nil
+	Repo    *git.Repository
+	Treeish string
+	Build   string
+	Stage   string
+	Stream  string
 }
 
 func (c Output) filepath() string {
-	return filepath.Join(c.Treeish, c.Build, c.Stage, c.Stream)
-}
-
-func (c Output) treeishOid() (*git.Oid, error) {
-	treeOid, err := c.treeFromTreeish()
-	if err != nil {
-		return nil, err
-	}
-
-	return treeOid, nil
+	return filepath.Join(
+		String(c.treeFromTreeish()),
+		c.Build,
+		c.Stage,
+		c.Stream,
+	)
 }
 
 func (c Output) treeFromTreeish() (*git.Oid, error) {
-	object, err := c.repo.RevparseSingle(treeish)
+	object, err := c.Repo.RevparseSingle(treeish)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,45 +60,6 @@ func (c Output) readRef() error {
 
 	return nil
 }
-
-//func Display(string) error {
-//  // TODO: handle -only flag
-//  // TODO: handle "latest" for -build flag
-
-//  repo, err := git.OpenRepository(".")
-//  if err != nil {
-//    log.Fatal(err)
-//  }
-
-//  treeOid, err := treeId(repo, treeish)
-//  if err != nil {
-//    log.Fatal(err)
-//  }
-
-//  treeId := treeOid.String()
-
-//  outputPath := filepath.Join(
-//    "refs",
-//    "builds",
-//    treeId,
-//    config.Build,
-//    config.Stream,
-//  )
-
-//  buf, err := readBuild(outputPath)
-//  if err != nil {
-//    log.Fatal(err)
-//  }
-
-//  blob, err := buf.Read()
-//  if err != nil {
-//    log.Fatal(err)
-//  }
-
-//  fmt.Println(blob)
-
-//  return nil
-//}
 
 func readBuild(path string) (buf []byte, err error) {
 	buf, err = ioutil.ReadFile(path)

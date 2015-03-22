@@ -4,8 +4,6 @@ import "testing"
 
 func TestReadFile(t *testing.T) {
 
-	repo := git.OpenNewRepository(".")
-
 	config := &Config{
 		Repo:    repo,
 		Treeish: "treeish",
