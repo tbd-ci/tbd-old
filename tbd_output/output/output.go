@@ -8,6 +8,10 @@ import (
 	git "github.com/libgit2/git2go"
 )
 
+type Repo interface {
+	NewIndex() *git.Index
+}
+
 type Output struct {
 	Repo    *git.Repository
 	Treeish string
