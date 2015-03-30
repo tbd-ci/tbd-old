@@ -31,9 +31,9 @@ Core ideas driving `tbd` which are different to traditional CI:
 
 ## Build storage
 
-`tbd` stores build results in a git branch (called `tbd-ci` by default, controlled by TBD_STORAGE_BRANCH).
+`tbd` stores build results in a git ref (specifically `.git/refs/tbd-ci-all-build-results` by default, controlled by git config tbd.ref or TBD_REF environment).
 
-`tbd-ci` commits contain a directory for each commit/worktree which has ever been built.
+tbd commits contain a directory for each commit/worktree which has ever been built.
 Because of how git stores files, this requires very little storage.
 
 Example directory structure:
@@ -52,10 +52,10 @@ Example directory structure:
   <same thing>
 ```
 
-When you run a build, you create a new commit and update the `tbd-ci` branch
+When you run a build, you create a new commit and update the `.git/refs/tbd-ci-all-build-results` ref
 
 To check a file that was modified by the build process:
-`git show tbd-ci:<commit>/<metadata-hash>/<target>/WORKTREE/<artifact>`
+`git show tbd-ci-all-build-results:<commit>/<metadata-hash>/<target>/WORKTREE/<artifact>`
 `tbd show <ref-like> <target> [--build-number <metadata-hash, defaults to most recent>] WORKTREE/<artifact>`
 
 ### Advantages
