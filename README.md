@@ -57,7 +57,9 @@ When you run a build, you create a new commit and update the `.git/refs/tbd-ci-a
 
 To check a file that was modified by the build process:
 `git show tbd-ci-all-build-results:<commit>/<metadata-hash>/<target>/WORKTREE/<artifact>`
-`tbd show <ref-like> <target> [--build-number <metadata-hash, defaults to most recent>] WORKTREE/<artifact>`
+`git tbd show <ref-like> <target> [--build-number <metadata-hash, defaults to most recent>] -- artifacts/coverage.html`
+`git tbd show <ref-like> <target> [--build-number <metadata-hash, defaults to most recent>] <git show args>`
+`git tbd unpack <ref-like> <target> [--build-number <metadata-hash, defaults to most recent>] <dir_to_unpack_into>`
 
 ### Advantages
  * Builds can be viewed & data extracted without tbd tools installed
