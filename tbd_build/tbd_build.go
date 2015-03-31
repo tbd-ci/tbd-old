@@ -18,14 +18,10 @@ func init() {
 		flag.PrintDefaults()
 	}
 
-	config.ciDir = flag.String("ci-dir", "ci", "ci directory")
+	buildConfig.CiDir = *flag.String("ci-dir", "ci", "ci directory")
 }
 
-type Config struct {
-	ciDir *string
-}
-
-var config Config
+var buildConfig build.BuildConfig
 
 func main() {
 	flag.Parse()
@@ -41,7 +37,10 @@ func main() {
 	}
 	defer rmBuildDir(buildDir)
 
-	err = build.Build(os.Args[1], buildDir, *config.ciDir)
+	buildConfig.BuildDir = buildDir
+	buildConfig.Treeish = os.Args[1]
+
+	err = build.Build(buildConfig)
 	if err != nil {
 		log.Fatal(err)
 	}

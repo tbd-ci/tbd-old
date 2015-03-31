@@ -12,6 +12,12 @@ import (
 
 var cmdVal int
 
+type BuildConfig struct {
+	Treeish  string
+	CiDir    string
+	BuildDir string
+}
+
 func rmTmp(tmpDir string) error {
 	if err := os.RemoveAll(tmpDir); err != nil {
 		return err
@@ -19,18 +25,18 @@ func rmTmp(tmpDir string) error {
 	return nil
 }
 
-func Build(tree, buildDir, ciPath string) error {
+func Build(config BuildConfig) error {
 	walkFunc := func(path string, info os.FileInfo, e error) error {
 		if e != nil {
 			return e
 		}
 
 		// Only run for each of "ci/stage" subdirectories
-		if !info.IsDir() || filepath.Base(path) == "ci" {
+		if !info.IsDir() || filepath.Base(path) == config.CiDir {
 			return nil
 		}
 
-		tmpDir, err := mktmp.CheckoutTmp(tree)
+		tmpDir, err := mktmp.CheckoutTmp(config.Treeish)
 		if err != nil {
 			return err
 		}
@@ -39,12 +45,12 @@ func Build(tree, buildDir, ciPath string) error {
 		// Get the relative path of each command to run as we will be running
 		// it in its own tmp directory (not in `path`)
 		ciCmd := filepath.Join(path, "run")
-		relCmd, err := filepath.Rel(buildDir, ciCmd)
+		relCmd, err := filepath.Rel(config.BuildDir, ciCmd)
 		if err != nil {
 			return err
 		}
 
-		refPrefix := filepath.Join("refs", "builds", tree, filepath.Base(path))
+		refPrefix := filepath.Join("refs", "builds", config.Treeish, filepath.Base(path))
 		cmd := exec.Command("tbd_run", "-prefix", refPrefix, filepath.Join(tmpDir, relCmd))
 
 		cmd.Stdout = os.Stdout
@@ -58,7 +64,7 @@ func Build(tree, buildDir, ciPath string) error {
 		return nil
 	}
 
-	err := filepath.Walk(filepath.Join(buildDir, ciPath), walkFunc)
+	err := filepath.Walk(filepath.Join(config.BuildDir, config.CiDir), walkFunc)
 	if err != nil {
 		return err
 	}
@@ -68,12 +74,12 @@ func Build(tree, buildDir, ciPath string) error {
 
 	if cmdVal == 0 {
 		note.WriteNote(
-			tree,
+			config.Treeish,
 			success,
 		)
 	} else {
 		note.WriteNote(
-			tree,
+			config.Treeish,
 			failure,
 		)
 	}
