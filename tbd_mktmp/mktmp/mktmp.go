@@ -1,9 +1,8 @@
 package mktmp
 
 import (
-	"io/ioutil"
-
 	"github.com/libgit2/git2go"
+	"io/ioutil"
 )
 
 func CheckoutTmp(tree string) (string, error) {
