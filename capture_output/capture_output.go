@@ -1,4 +1,7 @@
 // Runs a command and captures its stdout and stderr
+// TODO: Save exit status
+// TODO: Save timestamped versions of the build output
+// TODO: Save worktree
 package capture_output
 
 import (
@@ -12,9 +15,19 @@ import (
 type Capture struct {
 	*exec.Cmd
 	*git.Repository
+
+	finished bool
+	err      error
+	stdout   *git.Oid
+	stderr   *git.Oid
+	combined *git.Oid
+	tree     *git.Oid
 }
 
-func (c Capture) Worktree() (*git.Oid, error) {
+func (c *Capture) run() {
+	if c.finished {
+		return
+	}
 	cmd := c.Cmd
 	stdout := bytes.Buffer{}
 	stderr := bytes.Buffer{}
@@ -29,41 +42,68 @@ func (c Capture) Worktree() (*git.Oid, error) {
 	cmd.Stdout = &multiBufferWriter{cmd.Stdout, &stdout, &combined}
 	cmd.Stderr = &multiBufferWriter{cmd.Stderr, &stderr, &combined}
 
-	err := run(cmd)
+	c.err = cmd.Start()
+	if c.err != nil {
+		return
+	}
+	err := cmd.Wait()
 	if err != nil {
-		return nil, err
+		// ExitError indicates process had a non-zero exit code.
+		// This is expected behavior for us.
+
+		_, isExitErr := err.(*exec.ExitError)
+		if !isExitErr {
+			c.err = err
+			return
+		}
 	}
 
-	tree, err := c.Repository.TreeBuilder()
-	if err != nil {
-		return nil, err
+	c.stdout, c.err = c.Repository.CreateBlobFromBuffer(stdout.Bytes())
+	if c.err != nil {
+		return
 	}
-	err = c.writeTree(tree, "STDOUT", stdout.Bytes())
-	if err != nil {
-		return nil, err
+	c.stderr, c.err = c.Repository.CreateBlobFromBuffer(stderr.Bytes())
+	if c.err != nil {
+		return
 	}
-	err = c.writeTree(tree, "STDERR", stderr.Bytes())
-	if err != nil {
-		return nil, err
-	}
-	err = c.writeTree(tree, "OUTPUT", combined.Bytes())
-	if err != nil {
-		return nil, err
-	}
-	treeOid, err := tree.Write()
-	if err != nil {
-		return nil, err
+	c.combined, c.err = c.Repository.CreateBlobFromBuffer(combined.Bytes())
+	if c.err != nil {
+		return
 	}
 
-	return treeOid, nil
+	var tree *git.TreeBuilder
+	tree, c.err = c.Repository.TreeBuilder()
+	if c.err != nil {
+		return
+	}
+	c.err = tree.Insert("STDOUT", c.stdout, int(git.FilemodeBlob))
+	if c.err != nil {
+		return
+	}
+	c.err = tree.Insert("STDERR", c.stderr, int(git.FilemodeBlob))
+	if c.err != nil {
+		return
+	}
+	c.err = tree.Insert("OUTPUT", c.combined, int(git.FilemodeBlob))
+	if c.err != nil {
+		return
+	}
+	c.tree, c.err = tree.Write()
+	if c.err != nil {
+		return
+	}
+
+	c.finished = true
 }
 
-func (c Capture) writeTree(tree *git.TreeBuilder, path string, bytes []byte) error {
-	blobid, err := c.Repository.CreateBlobFromBuffer(bytes)
-	if err != nil {
-		return err
-	}
-	return tree.Insert(path, blobid, int(git.FilemodeBlob))
+func (c *Capture) Err() error {
+	c.run()
+	return c.err
+}
+
+func (c *Capture) Worktree() *git.Oid {
+	c.run()
+	return c.tree
 }
 
 type multiBufferWriter struct {
@@ -79,21 +119,4 @@ func (db *multiBufferWriter) Write(p []byte) (int, error) {
 	db.output.Write(p[:n])
 	db.combined.Write(p[:n])
 	return n, err
-}
-
-func run(cmd *exec.Cmd) error {
-	err := cmd.Start()
-	if err != nil {
-		return err
-	}
-	err = cmd.Wait()
-	if err != nil {
-		// ExitError indicates process had a non-zero exit code.
-		// This is expected behavior for us.
-		_, isExitErr := err.(*exec.ExitError)
-		if !isExitErr {
-			return err
-		}
-	}
-	return nil
 }

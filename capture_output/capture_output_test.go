@@ -4,42 +4,35 @@ package capture_output
 
 import (
 	git "github.com/libgit2/git2go"
-	"io/ioutil"
+	"github.com/tbd-ci/tbd/git_tmpdir"
 	"os/exec"
+	"strings"
 	"testing"
 )
 
-func testHarness(t *testing.T, cmd *exec.Cmd) (*git.Repository, *git.Tree) {
-	path, err := ioutil.TempDir("", "tbd-capture-test")
-	if err != nil {
-		panic(err)
-	}
-	_, err = exec.Command("git", "init", path).CombinedOutput()
-	if err != nil {
-		panic(err)
-	}
-	repo, err := git.InitRepository(path, false)
-	if err != nil {
-		panic(err)
-	}
+func testHarness(
+	cmd *exec.Cmd,
+	cb func(*git.Repository, *git.Tree),
+) {
+	err := git_tmpdir.GitTmpDir("tbd-capture-test", func(repo *git.Repository) {
+		cap := Capture{
+			Cmd:        cmd,
+			Repository: repo,
+		}
+		treeOid := cap.Worktree()
 
-	// Test that a process can have output & captured
-	cap := Capture{
-		cmd,
-		repo,
-	}
-	treeOid, err := cap.Worktree()
+		tree, err := repo.LookupTree(treeOid)
+		if err != nil {
+			panic(err)
+		}
+		cb(repo, tree)
+	})
 	if err != nil {
 		panic(err)
 	}
-
-	tree, err := repo.LookupTree(treeOid)
-	if err != nil {
-		panic(err)
-	}
-	return repo, tree
 }
 
+// Test that a process can have output captured
 func TestCapture(t *testing.T) {
 	runner := `
 		echo 'stdout'
@@ -48,23 +41,39 @@ func TestCapture(t *testing.T) {
 		echo 'stdout'
 		echo 'stderr' 1>&2
 	`
-	repo, tree := testHarness(t, exec.Command("bash", "-c", runner))
-
-	eq(
-		t,
-		string(lookup(repo, tree.EntryByName("STDOUT").Id).Contents()),
-		"stdout\nstdout\n",
-	)
-	eq(
-		t,
-		string(lookup(repo, tree.EntryByName("STDERR").Id).Contents()),
-		"stderr\nstderr\n",
-	)
-
-	eq(
-		t,
-		string(lookup(repo, tree.EntryByName("OUTPUT").Id).Contents()),
-		"stdout\nstderr\nstdout\nstderr\n",
+	testHarness(
+		exec.Command("bash", "-c", runner),
+		func(repo *git.Repository, tree *git.Tree) {
+			eq(
+				t,
+				string(lookup(repo, tree.EntryByName("STDOUT").Id).Contents()),
+				"stdout\nstdout\n",
+			)
+			eq(
+				t,
+				string(lookup(repo, tree.EntryByName("STDERR").Id).Contents()),
+				"stderr\nstderr\n",
+			)
+			contents := string(lookup(repo, tree.EntryByName("OUTPUT").Id).Contents())
+			outs := strings.Count(contents, "stdout")
+			if outs != 2 {
+				t.Errorf(
+					"Expected %s to have 2 copies of %s, had %d",
+					contents,
+					"stdout",
+					outs,
+				)
+			}
+			errs := strings.Count(contents, "stderr")
+			if errs != 2 {
+				t.Errorf(
+					"Expected %s to have 2 copies of %s, had %d",
+					contents,
+					"stderr",
+					errs,
+				)
+			}
+		},
 	)
 }
 
@@ -75,6 +84,7 @@ func lookup(repo *git.Repository, id *git.Oid) *git.Blob {
 	}
 	return combined
 }
+
 func eq(t *testing.T, actual, expected string) {
 	if actual != expected {
 		t.Errorf("Expected '%s' to be '%s'", actual, expected)
