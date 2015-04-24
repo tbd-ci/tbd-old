@@ -54,7 +54,40 @@ func AppendTreeViaIndex(p Paths, t *git.Tree) (*git.Tree, error) {
 	if err != nil {
 		return nil, err
 	}
-	return t.Owner().LookupTree(treeOid)
+
+	savedTree, err := t.Owner().LookupTree(treeOid)
+	if err != nil {
+		return nil, err
+	}
+	blankTree, err := emptyTree(t.Owner())
+	if err != nil {
+		return nil, err
+	}
+	mergeOpts, err := git.DefaultMergeOptions()
+	if err != nil {
+		return nil, err
+	}
+	mergeIdx, err := t.Owner().MergeTrees(blankTree, t, savedTree, &mergeOpts)
+	if err != nil {
+		return nil, err
+	}
+	mergeOid, err := mergeIdx.WriteTreeTo(t.Owner())
+	if err != nil {
+		return nil, err
+	}
+	return t.Owner().LookupTree(mergeOid)
+}
+
+func emptyTree(repo *git.Repository) (*git.Tree, error) {
+	bld, err := repo.TreeBuilder()
+	if err != nil {
+		return nil, err
+	}
+	treeOid, err := bld.Write()
+	if err != nil {
+		return nil, err
+	}
+	return repo.LookupTree(treeOid)
 }
 
 func AppendRef(p Paths, ref string, in *git.Repository, author *git.Signature) error {

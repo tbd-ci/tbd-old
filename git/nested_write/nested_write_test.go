@@ -1,6 +1,7 @@
 package nested_write
 
 // TODO: Test writing a tree as well as a blob.
+// TODO: Test writing to a subtree which already has content
 
 import (
 	git "github.com/libgit2/git2go"
