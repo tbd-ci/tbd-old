@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/tbd-ci/tbd/subcommands/mktmp/mktmp"
+	"github.com/tbd-ci/tbd/subcommands/tbd-mktmp/mktmp"
 )
 
 func init() {

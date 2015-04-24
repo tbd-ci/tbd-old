@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/tbd-ci/tbd/subcommands/mktmp/mktmp"
-	"github.com/tbd-ci/tbd/subcommands/note/note"
+	"github.com/tbd-ci/tbd/subcommands/tbd-mktmp/mktmp"
+	"github.com/tbd-ci/tbd/subcommands/tbd-note/note"
 )
 
 var cmdVal int

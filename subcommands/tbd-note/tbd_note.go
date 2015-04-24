@@ -7,7 +7,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/tbd-ci/tbd/subcommands/note/note"
+	"github.com/tbd-ci/tbd/subcommands/tbd-note/note"
 )
 
 func init() {
