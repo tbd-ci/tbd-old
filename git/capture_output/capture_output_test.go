@@ -1,6 +1,6 @@
 package capture_output
 
-// TODO: Capture artifacts too
+// TODO: Capture artifacts too (no, not in this package)
 
 import (
 	git "github.com/libgit2/git2go"
