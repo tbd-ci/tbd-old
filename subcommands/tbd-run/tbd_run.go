@@ -26,7 +26,7 @@ func init() {
 
 	config.refName = flag.String(
 		"ref-name",
-		"refs/tbd-ci-all-build-results",
+		"refs/tbd/all-build-results",
 		"(required): Store run output under this git ref",
 	)
 	config.storePrefix = flag.String(

@@ -31,7 +31,7 @@ Core ideas driving `tbd` which are different to traditional CI:
 
 ## Build storage
 
-`tbd` stores build results in a git ref (specifically `.git/refs/tbd-ci-all-build-results` by default, controlled by git config tbd.ref or TBD_REF environment).
+`tbd` stores build results in a git ref (specifically `.git/refs/tbd/all-build-results` by default, controlled by git config tbd.ref or TBD_REF environment).
 
 tbd commits contain a directory for each commit/worktree which has ever been built.
 Because of how git stores files, this requires very little storage.
@@ -53,10 +53,10 @@ Example directory structure:
   <same thing>
 ```
 
-When you run a build, tbd creates a new commit on the `.git/refs/tbd-ci-all-build-results` ref
+When you run a build, tbd creates a new commit on the `.git/refs/tbd/all-build-results` ref
 
 To check a file that was modified by the build process:
-`git show tbd-ci-all-build-results:<commit>/<metadata-hash>/<target>/WORKTREE/<artifact>`
+`git show tbd/all-build-results:<commit>/<metadata-hash>/<target>/WORKTREE/<artifact>`
 `git tbd show <ref-like> <target> [--build-number <metadata-hash, defaults to most recent>] -- artifacts/coverage.html`
 `git tbd show <ref-like> <target> [--build-number <metadata-hash, defaults to most recent>] <git show args>`
 `git tbd unpack <ref-like> <target> [--build-number <metadata-hash, defaults to most recent>] <dir_to_unpack_into>`
@@ -75,5 +75,5 @@ No garbage collection for builds of a tree that was never pushed
 It's easy commit a large binary as part of the post-build worktree and hard to undo.
  * We'll need to make it obvious, when writing a build to git, that artifacts have been saved (name/size)
 
-A developer could carelessly check out `tbd-ci-all-build-results`, which would cause a *lot* of files to be written to their machine.
+A developer could carelessly check out `tbd/all-build-results`, which would cause a *lot* of files to be written to their machine.
 However, they would have to really be poking around since it's not in the `git branch` or `git tags` list.
