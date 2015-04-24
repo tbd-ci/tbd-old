@@ -77,3 +77,22 @@ It's easy commit a large binary as part of the post-build worktree and hard to u
 
 A developer could carelessly check out `tbd/all-build-results`, which would cause a *lot* of files to be written to their machine.
 However, they would have to really be poking around since it's not in the `git branch` or `git tags` list.
+
+## TODO
+
+### Sort out a way to merge build result refs without checking them out
+
+Currently users have to checkout the build result ref to merge their builds.
+There's no good reason for this as we never want to diff/merge individual files, only trees (and we anticipate conflicts being extremely rare - will still need to figure out how to resolve them).
+
+Options investigated:
+ * Storing in a `git notes` ref
+  - Only supports blobs which is a non-starter
+ * Storing in a branch
+  - :+1: Sets up remote syncs easily by default
+  - :-1: Easy to accidentally checkout
+  - :+1: Still need to checkout to merge using `git pull`
+ * Storing in a ref
+  - need to write a custom mergetool (but it sounds like that was going to happen anyways)
+  - eg `tbd-ff-merge refs/tbd/all-build-results refs/tbd/remotes/origin`
+
