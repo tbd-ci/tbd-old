@@ -3,6 +3,8 @@ package nested_write
 import (
 	git "github.com/libgit2/git2go"
 	"github.com/tbd-ci/tbd/git/tmpdir"
+	"os/exec"
+	"strings"
 	"testing"
 	"time"
 )
@@ -19,9 +21,17 @@ func TestNestedWrite(t *testing.T) {
 		die(err)
 		paths := Paths(make(map[string]git.Oid, 2))
 		paths["first/second/third.go"] = *file
-		commit, err := Append(paths, "refs/foobar", repo)
+
+		author := git.Signature{
+			Name:  "TBD",
+			Email: "tbd@example.org",
+			When:  time.Unix(0, 0),
+		}
+
+		err = AppendRef(paths, "refs/foobar", repo, &author)
 		die(err)
-		tree, err := commit.Tree()
+		committish := Lookup(repo, "refs/foobar")
+		tree, err := committish.tree, committish.err
 		die(err)
 		if tree.EntryCount() < 1 {
 			t.Error("Expected tree to have entries")
@@ -70,11 +80,32 @@ func TestNestedWrite(t *testing.T) {
 		if string(blob.Contents()) != "file contents" {
 			t.Errorf("Expected blob contents to be 'file contents', got '%s'", string(blob.Contents()))
 		}
+
+		revParseOut, err := runGitPath(repo.Path(), "git", "rev-parse", "refs/foobar")
+		dieOf(err, revParseOut)
+		if revParseOut != "c5d38cdeb4f6e98ee3646d0b73d65734a9ac4596" {
+			t.Errorf("Expected output of rev-parse to be 'c5d38cdeb4f6e98ee3646d0b73d65734a9ac4596', got '%s'", revParseOut)
+		}
+
 	})
+}
+
+func runGitPath(path string, command ...string) (output string, err error) {
+	c := exec.Command(command[0], command[1:]...)
+	c.Env = append(c.Env, "GIT_DIR="+path)
+	b, err := c.CombinedOutput()
+	output = strings.Trim(string(b), " \n")
+	return
 }
 
 func die(err error) {
 	if err != nil {
 		panic(err)
+	}
+}
+
+func dieOf(err error, reason string) {
+	if err != nil {
+		panic(err.Error() + " " + reason)
 	}
 }

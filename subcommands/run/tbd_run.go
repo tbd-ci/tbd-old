@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/exec"
 	"syscall"
+	"time"
 )
 
 func init() {
@@ -114,6 +115,11 @@ func main() {
 		nested_write.Paths{config.StorePrefix(): *oid},
 		config.Ref(),
 		repo,
+		&git.Signature{
+			Name:  "TBD",
+			Email: "TBD@example.org",
+			When:  time.Now(),
+		},
 	)
 	if err != nil {
 		panic(err)
