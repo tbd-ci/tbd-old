@@ -1,7 +1,7 @@
 package main
 
 import (
-	initRepo "github.com/tbd-ci/tbd/tbd_init/init"
+	initRepo "github.com/tbd-ci/tbd/subcommands/init/init"
 )
 
 func main() {

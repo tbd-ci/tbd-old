@@ -4,7 +4,7 @@ package capture_output
 
 import (
 	git "github.com/libgit2/git2go"
-	"github.com/tbd-ci/tbd/git_tmpdir"
+	"github.com/tbd-ci/tbd/git/tmpdir"
 	"os/exec"
 	"strings"
 	"testing"

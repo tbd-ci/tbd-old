@@ -2,7 +2,7 @@ package nested_write
 
 import (
 	git "github.com/libgit2/git2go"
-	"github.com/tbd-ci/tbd/git_tmpdir"
+	"github.com/tbd-ci/tbd/git/tmpdir"
 	"testing"
 	"time"
 )

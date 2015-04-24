@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/tbd-ci/tbd/tbd_save_tree/save_tree"
+	"github.com/tbd-ci/tbd/subcommands/save_tree/save_tree"
 	"os"
 )
 
