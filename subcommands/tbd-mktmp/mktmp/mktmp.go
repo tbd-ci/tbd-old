@@ -7,7 +7,7 @@ import (
 )
 
 func CheckoutTmp(tree string) (string, error) {
-	tmpPath, err := ioutil.TempDir("", "tbd_build")
+	tmpPath, err := ioutil.TempDir("", "tbd-build")
 	if err != nil {
 		return "", err
 	}

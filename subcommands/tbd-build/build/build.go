@@ -51,7 +51,7 @@ func Build(config BuildConfig) error {
 		}
 
 		refPrefix := filepath.Join("refs", "builds", config.Treeish, filepath.Base(path))
-		cmd := exec.Command("tbd_run", "-prefix", refPrefix, filepath.Join(tmpDir, relCmd))
+		cmd := exec.Command("tbd-run", "-prefix", refPrefix, filepath.Join(tmpDir, relCmd))
 
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr

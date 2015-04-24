@@ -1,12 +1,12 @@
-.TH tbd_build 1  "January 15, 2015" "version 0.1" "Tooling & Build Daemon"
+.TH tbd-build 1  "January 15, 2015" "version 0.1" "Tooling & Build Daemon"
 .SH NAME
-tbd_build \- Run the tbd build process.
+tbd-build \- Run the tbd build process.
 .SH SYNOPSIS
 .TP
 .B tbd build [options] <tree-id>
 
 .SH DESCRIPTION
-tbd_build runs the main build process. For each subdirectory within the ci/
+tbd-build runs the main build process. For each subdirectory within the ci/
 folder of the current working directory, tbd will check out a copy of your
 project to a temporary directory, run the ./run script in that directory and save
 the ouput of those commands to git (see tbd-run(1)).

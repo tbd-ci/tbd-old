@@ -16,7 +16,7 @@ func Worktree() (string, error) {
 	// Currently this just prints 'Error: Exit code <x>'.
 	// Probably want to show the error from git (e.g. no `.git` dir found)
 	env := os.Environ()
-	dir, err := ioutil.TempDir("", "tbd_index")
+	dir, err := ioutil.TempDir("", "tbd-index")
 	if err != nil {
 		return "", err
 	}

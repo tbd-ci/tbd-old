@@ -1,11 +1,11 @@
-.TH tbd_mktmp 1  "February 1, 2015" "version 0.1" "Tooling & Build Daemon"
+.TH tbd-mktmp 1  "February 1, 2015" "version 0.1" "Tooling & Build Daemon"
 .SH NAME
-tbd_mktmp \- Check out a git tree to a temporary directory.
+tbd-mktmp \- Check out a git tree to a temporary directory.
 .SH SYNOPSIS
 .TP
-.B tbd_mktmp <git tree>
+.B tbd-mktmp <git tree>
 .SH DESCRIPTION
-tbd_mktmp is intended to support decentralized continuous integration by checking out the given git tree object to a temporary directory. This avoids changes to the workdir interfering with running builds. The command returns the path to the temporary directory.
+tbd-mktmp is intended to support decentralized continuous integration by checking out the given git tree object to a temporary directory. This avoids changes to the workdir interfering with running builds. The command returns the path to the temporary directory.
 .SH OPTIONS
 .TP
 \-h

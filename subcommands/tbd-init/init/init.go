@@ -15,7 +15,7 @@ func Init() error {
 	if exists {
 		fmt.Print("You already have a ci/ directory.",
 			"\n",
-			"If this is not for tbd you will need to configure tbd to use an alternate directory (see man tbd_build)\n",
+			"If this is not for tbd you will need to configure tbd to use an alternate directory (see man tbd-build)\n",
 		)
 	} else {
 		fmt.Println("Adding `./ci` directory...")

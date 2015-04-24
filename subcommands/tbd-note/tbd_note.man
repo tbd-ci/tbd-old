@@ -1,13 +1,13 @@
-.TH tbd_note 1  "January 15, 2015" "version 0.1" "Tooling & Build Daemon"
+.TH tbd-note 1  "January 15, 2015" "version 0.1" "Tooling & Build Daemon"
 .SH NAME
-tbd_note \- Add build notes to a git tree object
+tbd-note \- Add build notes to a git tree object
 .SH SYNOPSIS
 .TP
-\fBtbd_note\fR [-tree=<\fItree-id\fR>] <\fImessage\fR>
+\fBtbd-note\fR [-tree=<\fItree-id\fR>] <\fImessage\fR>
 
 .SH DESCRIPTION
-.B tbd_note
-creates a git note attached the the tree object that details the success or failure of a particular build - see \fBtbd_build(1)\fR.
+.B tbd-note
+creates a git note attached the the tree object that details the success or failure of a particular build - see \fBtbd-build(1)\fR.
 .SH OPTIONS
 .TP
 .BR \-h ", " \-help

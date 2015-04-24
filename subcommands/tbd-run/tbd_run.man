@@ -1,9 +1,9 @@
-.TH tbd_run 1  "January 15, 2015" "version 0.1" "Tooling & Build Daemon"
+.TH tbd-run 1  "January 15, 2015" "version 0.1" "Tooling & Build Daemon"
 .SH NAME
-tbd_run \- Store the execution of a command in a git repository
+tbd-run \- Store the execution of a command in a git repository
 .SH SYNOPSIS
 .TP
-.B tbd_run
+.B tbd-run
 .br
 .I [-prefix=refs/builds]
 .br
@@ -14,14 +14,14 @@ tbd_run \- Store the execution of a command in a git repository
 .I <command>
 
 .SH DESCRIPTION
-tbd_run is intended to support decentralized continuous integration by storing build outputs alongside the code which created it.
+tbd-run is intended to support decentralized continuous integration by storing build outputs alongside the code which created it.
 .PP
 This has several advantages over traditional centralized CI tools:
  * A successful local build could allow CI to be skipped
  * Developers have a local copy of past build state to investigate failures
  * By building a tree, rather than a commit, a rebuild is not necesary after a fast-forward merge
 .PP
-tbd_run defaults to storing build state under
+tbd-run defaults to storing build state under
 .I refs/builds/<worktree git SHA>/.
 For instance, the stdout of a build run might be stored in refs/builds/ec98726595302b1163762d7b544093f6cac640df/STDOUT.
 The following are also stored: STDERR COMBINEDOUTPUT WORKTREE EXITCODE
@@ -37,7 +37,7 @@ Specify the ref prefix to store the outputs of <command>
 Print diagnostic information
 .TP
 \-propagateErrors
-tbd_run will exit with the same code as <command>.
+tbd-run will exit with the same code as <command>.
 .SH EXAMPLES
 .TP
 Run tests.sh and store the output under refs/tests. Exit with an error if tests.sh fails
