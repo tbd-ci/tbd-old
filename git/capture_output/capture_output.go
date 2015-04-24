@@ -6,7 +6,6 @@ package capture_output
 
 import (
 	"bytes"
-	"fmt"
 	git "github.com/libgit2/git2go"
 	"io"
 	"os"
@@ -93,7 +92,6 @@ func (c *Capture) run() {
 	if c.err != nil {
 		return
 	}
-	fmt.Println(c.tree.String())
 	c.finished = true
 }
 

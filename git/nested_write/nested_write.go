@@ -127,7 +127,6 @@ func Append(p Paths, ref string, in *git.Repository, author *git.Signature) (*gi
 	committish := Lookup(in, ref)
 	commits := []*git.Commit{committish.commit}
 	if committish.err != nil {
-		fmt.Println("Using empty tree")
 		// ref doesn't exist; use a nil commit and an empty tree.
 		commits = []*git.Commit{}
 		bld, err := in.TreeBuilder()
@@ -143,7 +142,6 @@ func Append(p Paths, ref string, in *git.Repository, author *git.Signature) (*gi
 			return nil, err
 		}
 	}
-	fmt.Println("Using existing tree with some entries: ", committish.tree.EntryCount())
 
 	tree, err := AppendTreeViaIndex(p, committish.tree)
 	if err != nil {
