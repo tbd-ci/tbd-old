@@ -9,7 +9,6 @@ import (
 	"fmt"
 	git "github.com/libgit2/git2go"
 	"github.com/tbd-ci/tbd/git/capture_output"
-	"github.com/tbd-ci/tbd/git/empty_ref"
 	"github.com/tbd-ci/tbd/git/nested_write"
 	"os"
 	"os/exec"
@@ -107,10 +106,6 @@ func main() {
 	}
 	oid := cmd.Worktree()
 
-	_, err = empty_ref.AssertRefIsCommit(repo, config.Ref(), nil)
-	if err != nil {
-		panic(err)
-	}
 	err = nested_write.AppendRef(
 		nested_write.Paths{config.StorePrefix(): *oid},
 		config.Ref(),

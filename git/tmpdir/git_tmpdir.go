@@ -17,13 +17,13 @@ func GitTmpDir(path string, cb func(*git.Repository)) error {
 	path, err := ioutil.TempDir("", "tbd-capture-test")
 	die(err)
 	defer os.RemoveAll(path) // Cleanup on panic
+	ioutil.WriteFile(path+"/uncommitted", []byte("Uncommitted content"), os.ModePerm)
 	repo, err := git.InitRepository(path, false)
 	die(err)
 	bld, err := repo.TreeBuilder()
 	die(err)
 	blobid, err := repo.CreateBlobFromBuffer([]byte("This is a sample commit"))
 	die(err)
-
 	err = bld.Insert("README.MD", blobid, int(git.FilemodeBlob))
 	die(err)
 	treeId, err := bld.Write()

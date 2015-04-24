@@ -1,6 +1,7 @@
 package nested_write
 
 import (
+	"fmt"
 	git "github.com/libgit2/git2go"
 	"github.com/tbd-ci/tbd/git/empty_ref"
 	"time"
@@ -9,10 +10,30 @@ import (
 type Paths map[string]git.Oid
 
 func AppendTreeViaIndex(p Paths, t *git.Tree) (*git.Tree, error) {
-	idx, err := t.Owner().Index()
+	idx, err := git.NewIndex()
 	if err != nil {
 		return nil, err
 	}
+
+	for path, oid := range p {
+		obj, err := t.Owner().Lookup(&oid)
+		if err != nil {
+			return nil, err
+		}
+		switch obj.Type() {
+		case git.ObjectTree:
+			subtree := obj.(*git.Tree)
+			for i := uint64(0); i < subtree.EntryCount(); i++ {
+				entry := subtree.EntryByIndex(i)
+				p[path+"/"+entry.Name] = *entry.Id
+			}
+			delete(p, path)
+		case git.ObjectBlob:
+		default:
+			return nil, fmt.Errorf("Expected blob or tree, got '%s'", obj.Type().String())
+		}
+	}
+
 	for path, oid := range p {
 		err = idx.Add(&git.IndexEntry{
 			Ctime: time.Now(),
@@ -25,10 +46,11 @@ func AppendTreeViaIndex(p Paths, t *git.Tree) (*git.Tree, error) {
 			Path:  path,
 		})
 		if err != nil {
+			panic(err)
 			return nil, err
 		}
 	}
-	treeOid, err := idx.WriteTree()
+	treeOid, err := idx.WriteTreeTo(t.Owner())
 	if err != nil {
 		return nil, err
 	}
@@ -36,6 +58,13 @@ func AppendTreeViaIndex(p Paths, t *git.Tree) (*git.Tree, error) {
 }
 
 func AppendRef(p Paths, ref string, in *git.Repository, author *git.Signature) error {
+	var err error
+	if author == nil {
+		author, err = in.DefaultSignature()
+		if err != nil {
+			return err
+		}
+	}
 	commit, err := Append(p, ref, in, author)
 	if err != nil {
 		return err
@@ -65,6 +94,7 @@ func Append(p Paths, ref string, in *git.Repository, author *git.Signature) (*gi
 	committish := Lookup(in, ref)
 	commits := []*git.Commit{committish.commit}
 	if committish.err != nil {
+		fmt.Println("Using empty tree")
 		// ref doesn't exist; use a nil commit and an empty tree.
 		commits = []*git.Commit{}
 		bld, err := in.TreeBuilder()
@@ -80,6 +110,7 @@ func Append(p Paths, ref string, in *git.Repository, author *git.Signature) (*gi
 			return nil, err
 		}
 	}
+	fmt.Println("Using existing tree with some entries: ", committish.tree.EntryCount())
 
 	tree, err := AppendTreeViaIndex(p, committish.tree)
 	if err != nil {

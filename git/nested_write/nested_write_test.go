@@ -1,5 +1,7 @@
 package nested_write
 
+// TODO: Test writing a tree as well as a blob.
+
 import (
 	git "github.com/libgit2/git2go"
 	"github.com/tbd-ci/tbd/git/tmpdir"
@@ -83,10 +85,16 @@ func TestNestedWrite(t *testing.T) {
 
 		revParseOut, err := runGitPath(repo.Path(), "git", "rev-parse", "refs/foobar")
 		dieOf(err, revParseOut)
-		if revParseOut != "c5d38cdeb4f6e98ee3646d0b73d65734a9ac4596" {
+		if revParseOut != committish.commit.Id().String() {
 			t.Errorf("Expected output of rev-parse to be 'c5d38cdeb4f6e98ee3646d0b73d65734a9ac4596', got '%s'", revParseOut)
 		}
 
+		rawTree, err := runGitPath(repo.Path(), "git", "cat-file", "-p", committish.tree.Id().String())
+		dieOf(err, rawTree)
+		expectedTree := `040000 tree 46736b97f44a7d10e92dadfdfc5c7a921f191803	first`
+		if rawTree != expectedTree {
+			t.Errorf("Expected output of cat-file to be '%s', got '%s'", expectedTree, rawTree)
+		}
 	})
 }
 
