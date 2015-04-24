@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/tbd-ci/tbd/tbd_build/build"
-	"github.com/tbd-ci/tbd/tbd_mktmp/mktmp"
+	"github.com/tbd-ci/tbd/subcommands/build/build"
+	"github.com/tbd-ci/tbd/subcommands/mktmp/mktmp"
 )
 
 func init() {
