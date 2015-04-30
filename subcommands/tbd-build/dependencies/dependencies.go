@@ -17,6 +17,20 @@ func Next(deps *Dependencies) (string, error) {
 	return "", fmt.Errorf("No dependencies or circular dependencies detected")
 }
 
+func RemoveComplete(deps *Dependencies, task string) {
+	delete(deps.dependent, task)
+
+	for k, v := range deps.dependent {
+		if len(v) != 0 {
+			for i, value := range v {
+				if value == task {
+					deps.dependent[k] = append(v[:i], v[i+1:]...)
+				}
+			}
+		}
+	}
+}
+
 //func get(path string) (error, deps *Dependencies) {
 //  depTree := make(map[string][]string)
 //  err := filepath.Walk(path, func(taskPath string, info *os.FileInfo, err error) error {

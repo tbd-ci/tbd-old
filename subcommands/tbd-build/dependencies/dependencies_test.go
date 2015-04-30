@@ -5,12 +5,6 @@ import "testing"
 func TestNext(t *testing.T) {
 	depTree := make(map[string][]string)
 
-	// dependencies a -> b --- a depends on b
-	// c -> a
-	// d -> b
-	// e -> c
-	// e -> d
-
 	depTree["taskA"] = []string{}
 	depTree["taskB"] = []string{}
 	depTree["taskC"] = []string{"taskA"}
@@ -28,6 +22,36 @@ func TestNext(t *testing.T) {
 
 	if next != "taskA" && next != "taskB" {
 		t.Errorf("%v should have been taskA or taskB", next)
+	}
+}
+
+func TestRemoveComplete(t *testing.T) {
+	depTree := make(map[string][]string)
+
+	depTree["taskA"] = []string{}
+	depTree["taskB"] = []string{}
+	depTree["taskC"] = []string{"taskA", "taskB"}
+	depTree["taskD"] = []string{"taskB"}
+	depTree["taskE"] = []string{"taskC", "taskD"}
+
+	deps := Dependencies{
+		dependent: depTree,
+	}
+
+	RemoveComplete(&deps, "taskA")
+
+	_, ok := deps.dependent["taskA"]
+	if ok {
+		t.Fatal("taskA should not exist")
+	}
+
+	taskC, ok := deps.dependent["taskC"]
+	if !ok {
+		t.Fatal("taskC not found")
+	}
+
+	if len(taskC) != 1 || taskC[0] != "taskB" {
+		t.Fatal("taskC should be empty")
 	}
 }
 
