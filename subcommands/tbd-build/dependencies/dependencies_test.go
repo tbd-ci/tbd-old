@@ -2,55 +2,33 @@ package dependencies
 
 import "testing"
 
-func TestNextBatch(t *testing.T) {
+func TestNext(t *testing.T) {
 	depTree := make(map[string][]string)
 
 	// dependencies a -> b --- a depends on b
 	// c -> a
-	// c -> b
-	// d -> a
 	// d -> b
 	// e -> c
-	// f -> d
-	// g -> e
-	// h -> f
-	// h -> e
-	// i -> g
-	// i -> h
+	// e -> d
 
 	depTree["taskA"] = []string{}
 	depTree["taskB"] = []string{}
-	depTree["taskC"] = []string{"taskA", "taskB"}
-	depTree["taskD"] = []string{"taskA", "taskB"}
-	depTree["taskE"] = []string{"taskC"}
-	depTree["taskF"] = []string{"taskD"}
-	depTree["taskG"] = []string{"taskE"}
-	depTree["taskH"] = []string{"taskE", "taskF"}
-	depTree["taskI"] = []string{"taskG", "taskH"}
+	depTree["taskC"] = []string{"taskA"}
+	depTree["taskD"] = []string{"taskB"}
+	depTree["taskE"] = []string{"taskC", "taskD"}
 
 	deps := Dependencies{
 		dependent: depTree,
 	}
 
-	next, err := NextBatch(&deps)
+	next, err := Next(&deps)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if next != "taskA" {
-		t.Errorf("%v should have been taskA", next)
+	if next != "taskA" && next != "taskB" {
+		t.Errorf("%v should have been taskA or taskB", next)
 	}
-
-	next, err = NextBatch(&deps)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// taskA complete, remove from depTree
-	if next != "taskB" {
-		t.Errorf("%v should have been [taskA, taskB]", next)
-	}
-
 }
 
 //func TestGet(t *testing.T) {

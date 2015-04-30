@@ -8,7 +8,7 @@ type Dependencies struct {
 
 var dependencies Dependencies
 
-func NextBatch(deps *Dependencies) (string, error) {
+func Next(deps *Dependencies) (string, error) {
 	for key, vals := range deps.dependent {
 		if len(vals) == 0 {
 			return key, nil
